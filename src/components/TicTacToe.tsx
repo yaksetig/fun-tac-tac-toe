@@ -3,17 +3,21 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Square } from "@/components/Square";
 import { calculateWinner } from "@/lib/game-utils";
+import { invokeResponseCallback, invokeExpiredCallback, invokeErrorCallback } from "@gotcha-widget/lib";
 
 const GAME_TIMEOUT = 60000; // 60 seconds
+const SECRET_KEY = "tictactoe_secret"; // You might want to make this configurable
 
 const TicTacToe = () => {
   const [squares, setSquares] = useState(Array(9).fill(null));
-  const [oIsNext, setOIsNext] = useState(true); // Changed to oIsNext for clarity
+  const [oIsNext, setOIsNext] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
     // Set up game timeout
     const timeoutId = setTimeout(() => {
+      console.log("Game timed out - invoking expired callback");
+      invokeExpiredCallback();
       toast({
         title: "Game Over!",
         description: "Time's up! ⏰",
@@ -40,25 +44,40 @@ const TicTacToe = () => {
   }, [oIsNext, squares]);
 
   const handleMove = (i: number) => {
-    if (calculateWinner(squares) || squares[i]) {
-      return;
-    }
+    try {
+      if (calculateWinner(squares) || squares[i]) {
+        return;
+      }
 
-    const newSquares = squares.slice();
-    newSquares[i] = oIsNext ? "O" : "X";
-    setSquares(newSquares);
-    setOIsNext(!oIsNext);
+      const newSquares = squares.slice();
+      newSquares[i] = oIsNext ? "O" : "X";
+      setSquares(newSquares);
+      setOIsNext(!oIsNext);
 
-    const winner = calculateWinner(newSquares);
-    if (winner) {
+      const winner = calculateWinner(newSquares);
+      if (winner) {
+        const playerWon = winner === "O";
+        console.log(`Game ended - Player ${winner} wins - invoking response callback`);
+        invokeResponseCallback(playerWon, SECRET_KEY);
+        toast({
+          title: "Game Over!",
+          description: `Player ${winner} wins! 🎉`,
+        });
+      } else if (newSquares.every((square) => square !== null)) {
+        console.log("Game ended in draw - invoking response callback with false");
+        invokeResponseCallback(false, SECRET_KEY);
+        toast({
+          title: "Game Over!",
+          description: "It's a draw! 🤝",
+        });
+      }
+    } catch (error) {
+      console.log("Error occurred during game - invoking error callback");
+      invokeErrorCallback();
       toast({
-        title: "Game Over!",
-        description: `Player ${winner} wins! 🎉`,
-      });
-    } else if (newSquares.every((square) => square !== null)) {
-      toast({
-        title: "Game Over!",
-        description: "It's a draw! 🤝",
+        title: "Error",
+        description: "An error occurred during the game.",
+        variant: "destructive",
       });
     }
   };
