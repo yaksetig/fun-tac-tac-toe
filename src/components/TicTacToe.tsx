@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Square } from "@/components/Square";
 import { calculateWinner } from "@/lib/game-utils";
-import { invokeResponseCallback, invokeExpiredCallback, invokeErrorCallback } from "@gotcha-widget/lib";
+import { invokeResponseCallback, invokeExpiredCallback, invokeErrorCallback } from "@/lib/widget-utils";
 
 const GAME_TIMEOUT = 60000; // 60 seconds
 const SECRET_KEY = "tictactoe_secret"; // You might want to make this configurable
