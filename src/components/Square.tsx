@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import logo from "../assets/logo.png";  // Add this import
 
 interface SquareProps {
   value: string | null;
@@ -19,7 +20,7 @@ export const Square = ({ value, onClick }: SquareProps) => {
     >
       {value === "O" ? (
         <img
-          src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e"
+          src={logo}
           alt="O"
           className="w-12 h-12 object-contain rounded-full"
         />
