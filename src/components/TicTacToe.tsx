@@ -8,7 +8,7 @@ const GAME_TIMEOUT = 60000; // 60 seconds
 
 const TicTacToe = () => {
   const [squares, setSquares] = useState(Array(9).fill(null));
-  const [xIsNext, setXIsNext] = useState(true);
+  const [oIsNext, setOIsNext] = useState(true); // Changed to oIsNext for clarity
   const { toast } = useToast();
 
   useEffect(() => {
@@ -24,8 +24,8 @@ const TicTacToe = () => {
   }, []);
 
   useEffect(() => {
-    // Handle computer's move (O)
-    if (!xIsNext && !calculateWinner(squares)) {
+    // Handle computer's move (X)
+    if (!oIsNext && !calculateWinner(squares)) {
       const emptySquares = squares
         .map((square, index) => (square === null ? index : null))
         .filter((index): index is number => index !== null);
@@ -34,10 +34,10 @@ const TicTacToe = () => {
         const randomIndex = emptySquares[Math.floor(Math.random() * emptySquares.length)];
         setTimeout(() => {
           handleMove(randomIndex);
-        }, 500); // Add a small delay to make it feel more natural
+        }, 500);
       }
     }
-  }, [xIsNext, squares]);
+  }, [oIsNext, squares]);
 
   const handleMove = (i: number) => {
     if (calculateWinner(squares) || squares[i]) {
@@ -45,9 +45,9 @@ const TicTacToe = () => {
     }
 
     const newSquares = squares.slice();
-    newSquares[i] = xIsNext ? "X" : "O";
+    newSquares[i] = oIsNext ? "O" : "X";
     setSquares(newSquares);
-    setXIsNext(!xIsNext);
+    setOIsNext(!oIsNext);
 
     const winner = calculateWinner(newSquares);
     if (winner) {
@@ -65,7 +65,7 @@ const TicTacToe = () => {
 
   const resetGame = () => {
     setSquares(Array(9).fill(null));
-    setXIsNext(true);
+    setOIsNext(true);
     toast({
       title: "New Game",
       description: "The board has been reset! 🎮",
@@ -78,7 +78,7 @@ const TicTacToe = () => {
     ? `Winner: ${winner}`
     : isDraw
     ? "Game Draw!"
-    : `Next player: ${xIsNext ? "X" : "O"}`;
+    : `Next player: ${oIsNext ? "O" : "X"}`;
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -88,7 +88,7 @@ const TicTacToe = () => {
           <Square 
             key={i} 
             value={square} 
-            onClick={() => xIsNext ? handleMove(i) : null} 
+            onClick={() => oIsNext ? handleMove(i) : null} 
           />
         ))}
       </div>
