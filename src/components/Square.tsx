@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import logo from "../assets/logo.png";  // Add this import
+import logo from "@/assets/logo.png";  // Updated import path to use alias
 
 interface SquareProps {
   value: string | null;
