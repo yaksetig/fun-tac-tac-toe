@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Square } from "@/components/Square";
 import { calculateWinner } from "@/lib/game-utils";
-import { handleGameEnd, handleGameError, handleGameTimeout } from "@/lib/widget-integration";
 
 const GAME_TIMEOUT = 60000; // 60 seconds
 
@@ -15,7 +14,6 @@ const TicTacToe = () => {
   useEffect(() => {
     // Set up game timeout
     const timeoutId = setTimeout(() => {
-      handleGameTimeout();
       toast({
         title: "Game Over!",
         description: "Time's up! ⏰",
@@ -42,36 +40,25 @@ const TicTacToe = () => {
   }, [xIsNext, squares]);
 
   const handleMove = (i: number) => {
-    try {
-      if (calculateWinner(squares) || squares[i]) {
-        return;
-      }
+    if (calculateWinner(squares) || squares[i]) {
+      return;
+    }
 
-      const newSquares = squares.slice();
-      newSquares[i] = xIsNext ? "X" : "O";
-      setSquares(newSquares);
-      setXIsNext(!xIsNext);
+    const newSquares = squares.slice();
+    newSquares[i] = xIsNext ? "X" : "O";
+    setSquares(newSquares);
+    setXIsNext(!xIsNext);
 
-      const winner = calculateWinner(newSquares);
-      if (winner) {
-        handleGameEnd(winner);
-        toast({
-          title: "Game Over!",
-          description: `Player ${winner} wins! 🎉`,
-        });
-      } else if (newSquares.every((square) => square !== null)) {
-        handleGameEnd(null);
-        toast({
-          title: "Game Over!",
-          description: "It's a draw! 🤝",
-        });
-      }
-    } catch (error) {
-      handleGameError();
+    const winner = calculateWinner(newSquares);
+    if (winner) {
       toast({
-        title: "Error",
-        description: "An error occurred while playing the game",
-        variant: "destructive",
+        title: "Game Over!",
+        description: `Player ${winner} wins! 🎉`,
+      });
+    } else if (newSquares.every((square) => square !== null)) {
+      toast({
+        title: "Game Over!",
+        description: "It's a draw! 🤝",
       });
     }
   };
