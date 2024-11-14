@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Square } from "@/components/Square";
 import { calculateWinner } from "@/lib/game-utils";
-import { invokeResponseCallback, invokeExpiredCallback, invokeErrorCallback } from "@gotcha-widget/lib";
+import { invokeResponseCallback, invokeExpiredCallback, invokeErrorCallback } from "@/lib/widget-utils";
 
 const GAME_TIMEOUT = 60000; // 60 seconds
 const SECRET_KEY = "tictactoe_secret"; // You might want to make this configurable
@@ -19,7 +20,7 @@ const TicTacToe = () => {
       invokeExpiredCallback();
       toast({
         title: "Game Over!",
-        description: "Time's up! ⏰"
+        description: "Time's up! ⏰",
       });
     }, GAME_TIMEOUT);
 
@@ -30,7 +31,7 @@ const TicTacToe = () => {
     // Handle computer's move (X)
     if (!oIsNext && !calculateWinner(squares)) {
       const emptySquares = squares
-        .map((square, index) => square === null ? index : null)
+        .map((square, index) => (square === null ? index : null))
         .filter((index): index is number => index !== null);
 
       if (emptySquares.length > 0) {
@@ -60,14 +61,14 @@ const TicTacToe = () => {
         invokeResponseCallback(playerWon, SECRET_KEY);
         toast({
           title: "Game Over!",
-          description: `Player ${winner} wins! 🎉`
+          description: `Player ${winner} wins! 🎉`,
         });
       } else if (newSquares.every((square) => square !== null)) {
         console.log("Game ended in draw - invoking response callback with false");
         invokeResponseCallback(false, SECRET_KEY);
         toast({
           title: "Game Over!",
-          description: "It's a draw! 🤝"
+          description: "It's a draw! 🤝",
         });
       }
     } catch (error) {
@@ -76,9 +77,18 @@ const TicTacToe = () => {
       toast({
         title: "Error",
         description: "An error occurred during the game.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
+  };
+
+  const resetGame = () => {
+    setSquares(Array(9).fill(null));
+    setOIsNext(true);
+    toast({
+      title: "New Game",
+      description: "The board has been reset! 🎮",
+    });
   };
 
   const winner = calculateWinner(squares);
@@ -101,6 +111,12 @@ const TicTacToe = () => {
           />
         ))}
       </div>
+      <Button
+        onClick={resetGame}
+        className="mt-4 bg-indigo-600 hover:bg-indigo-700"
+      >
+        Reset Game
+      </Button>
     </div>
   );
 };
